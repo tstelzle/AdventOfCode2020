@@ -47,11 +47,30 @@ def problem_two(data_dict: dict):
                 copy_dict[key]["operation"] = "nop"
             else:
                 copy_dict[key]["operation"] = "jmp"
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future = executor.submit(problem_one, copy_dict)
-                future_output = future.result()
-                if future_output[0] == pointer_to_reach:
-                    return future_output
+            result = problem_one(copy_dict)
+            if result[0] == pointer_to_reach:
+                return result
+
+
+def problem_two_threads(data_dict: dict):
+    possible_boot_codes = [data_dict]
+    pointer_to_reach = len(data_dict.keys()) - 1
+    solutions = []
+    for key, elem in data_dict.items():
+        if elem["operation"] == "jmp" or elem["operation"] == "nop":
+            copy_dict = copy.deepcopy(data_dict)
+            if elem["operation"] == "jmp":
+                copy_dict[key]["operation"] = "nop"
+            else:
+                copy_dict[key]["operation"] = "jmp"
+            possible_boot_codes.append(copy_dict)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(problem_one, boot_code).result() for boot_code in possible_boot_codes]
+    for future in futures:
+        if future[0] == pointer_to_reach:
+            solutions.append(future)
+
+    return solutions
 
 
 def print_dict(data_dict: dict):
@@ -69,6 +88,9 @@ def main():
 
     data_dict = read_data()
     print(problem_two(data_dict))
+
+    data_dict = read_data()
+    print(problem_two_threads(data_dict))
 
 
 if __name__ == "__main__":

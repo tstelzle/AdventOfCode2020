@@ -3,12 +3,7 @@ def read_data():
 
     my_timestamp = int(file_reader.readline()[:-1])
 
-    bus_ids = file_reader.readline()[:-1].split(',')
-    while 'x' in bus_ids:
-        bus_ids.remove('x')
-    bus_ids = sorted(bus_ids)
-
-    bus_ids = list(map(int, bus_ids))
+    bus_ids = file_reader.readline().split(',')
 
     dictionary = {'timestamp': my_timestamp, 'busses': bus_ids}
 
@@ -24,16 +19,16 @@ def problem_one(data: dict):
     difference = -1
 
     for bus in busses:
-        initial = timestamp // bus
-        departure = initial * bus
-        while departure < timestamp:
-            departure += bus
-        new_difference = departure - timestamp
-        if difference == -1:
-            difference = new_difference
-        if new_difference < difference:
-            difference = new_difference
-            bus_id = bus
+        if bus != 'x':
+            bus = int(bus)
+            initial = timestamp // bus
+            departure = (initial +1) * bus
+            new_difference = departure - timestamp
+            if difference == -1:
+                difference = new_difference
+            if new_difference < difference:
+                difference = new_difference
+                bus_id = bus
 
     return bus_id * difference
 
